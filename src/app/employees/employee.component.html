@@ -1,0 +1,194 @@
+<div class="card mt-5">
+    <div class="card-body">
+        <div class="card-title">
+            <button class="btn btn-primary btn-sm" style="float: right;" (click)="open(content)">Agregar nuevo
+                Empleado </button>
+            <h5>Empleados</h5>
+            <p>Empleados resgistrados en la base de datos</p>
+        </div>
+
+        <table class="table table-bordered table-striped mt-4" *ngIf="!loading && employees.length > 0; else notData">
+            <thead class="bg-light">
+                <tr>
+                    <th scope="col">
+                        <fa-icon [icon]="faUser" class="mx-1" size="xs"></fa-icon> Nombre
+                    </th>
+                    <th scope="col">
+                        <fa-icon [icon]="faAt" class="mx-1" size="xs"></fa-icon>Email
+                    </th>
+                    <th scope="col">
+                        <fa-icon [icon]="faVenusMars" class="mx-1" size="xs"></fa-icon>Sexo
+                    </th>
+                    <th scope="col">
+                        <fa-icon [icon]="faBriefcase" class="mx-1" size="xs"></fa-icon>Area
+                    </th>
+                    <th scope="col">
+                        <fa-icon [icon]="faEnvelope" class="mx-1" size="xs"></fa-icon>Boletin
+                    </th>
+                    <th scope="col" style="width: 50px;">Modificar</th>
+                    <th scope="col" style="width: 50px;">Eliminar</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr *ngFor="let employee of employees"
+                    [ngClass]="{'bg-danger text-white': (employee.status === 'Inactivo' )}">
+                    <td scope="row"> {{ employee.nombre }} </td>
+                    <td> {{ employee.email }} </td>
+                    <td> {{ employee.sexo == 'M' ? 'Masculino' : 'Femenino'}} </td>
+                    <td> {{ employee.area.nombre }} </td>
+                    <td> {{ employee.boletin ? 'Si' : 'No' }} </td>
+                    <td>
+                        <div class="text-center">
+                            <button class="btn btn-xs" (click)="getemployee(employee)">
+                                <fa-icon [icon]="faEdit" size="xs"></fa-icon>
+                            </button>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="text-center">
+                            <button class="btn btn-xs" (click)="anularOActivar(employee, 'Activo')">
+                                <fa-icon [icon]="faTrash" size="xs">
+                                </fa-icon>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+</div>
+<ng-template #content let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Empleado</h4>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="w-100 alert-info px-2 py-3 "><small>Todos los campos con asterisco (*) son obligatorios</small></div>
+
+    <div class="modal-body">
+
+        <form [formGroup]="form">
+
+            <div class="form-group row">
+                <label for="name" class="col-sm-4 col-form-label text-right ">
+                    <span class="text text-dark font-weight-bold">
+                        Nombre Completo*
+                    </span> </label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control form-control-sm" id="name"
+                        placeholder="Nombre completo del empleado" formControlName="name">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="name" class="col-sm-4 col-form-label text-right ">
+                    <span class="text text-dark font-weight-bold">
+                        Correo electronico*
+                    </span> </label>
+                <div class="col-sm-8">
+                    <input type="email" class="form-control form-control-sm" id="email" placeholder="Correo electronico"
+                        formControlName="email">
+                </div>
+            </div>
+
+
+            <div class="form-group row">
+
+                <label for="flexCheckDefault" class="col-sm-4 col-form-label text-right ">
+                    <span class="text text-dark font-weight-bold">
+                        Sexo*
+                    </span> </label>
+
+                <div class="form-check col-sm-8">
+
+
+
+
+                    <div class="form-check">
+                        <input class="form-check-input" value="M" type="radio" name="sex" id="sex1"
+                            formControlName="sex">
+                        <label class="form-check-label" for="sex1">
+                            Masculino
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" value="F" type="radio" name="sex" id="sex2" checked
+                            formControlName="sex">
+                        <label class="form-check-label" for="sex2">
+                            Femenino
+                        </label>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="form-group row">
+                <label for="name" class="col-sm-4 col-form-label text-right ">
+                    <span class="text text-dark font-weight-bold">
+                        Area*
+                    </span> </label>
+                <div class="col-sm-8">
+                    <select name="area" id="area" class="custom-select" formControlName="area">
+                        <option [value]="area.id" *ngFor="let area of Areas">{{area.nombre}}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="name" class="col-sm-4 col-form-label text-right ">
+                    <span class="text text-dark font-weight-bold">
+                        Descripcion*
+                    </span> </label>
+                <div class="col-sm-8">
+                    <textarea type="text" class="form-control form-control-sm" id="name"
+                        placeholder="Descripcion de la experiencia del empleado"
+                        formControlName="description"></textarea>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="name" class="col-sm-4 col-form-label text-right d-block w-100">
+                    <span class="w-100"></span> </label>
+                <div class="form-check col-sm-7  d-inline m-3">
+                    <input class="form-check-input" type="checkbox" value="" formControlName="news"
+                        id="flexCheckChecked">
+                    <label class="form-check-label" for="flexCheckChecked">
+                        Deseo recibir boletin de noticias
+                    </label>
+                </div>
+
+            </div>
+
+            <div class="form-group row">
+                <label for="name" class="col-sm-4 col-form-label text-right ">
+                    <span class="text text-dark font-weight-bold">
+                        Roles *
+                    </span> </label>
+
+                <div class="form-check col-sm-8">
+                    <div class="form-check col-sm-8" *ngFor="let data of Data; let i=index">
+                        <input class="form-check-input" type="checkbox" [value]="data.id" id="{{i}}"
+                            (change)="onCheckboxChange($event)" formArrayName="rol">
+                        <label class="form-check-label" for="{{i}}">
+                            {{data.nombre}}
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+        <div class="form-group row">
+            <label for="name" class="col-sm-4 text-white"></label>
+            <div class="col-sm-7 d-inline m-3 text-white">
+                <div class="form-group  row text-center ">
+                    <button class="btn btn-sm btn-primary" (click)="createNewemployee()" [disabled]="form.invalid">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</ng-template>
