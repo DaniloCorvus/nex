@@ -1,7 +1,7 @@
 <div class="card mt-5">
     <div class="card-body">
         <div class="card-title">
-            <button class="btn btn-primary btn-sm" style="float: right;" (click)="open(content)">Agregar nuevo
+            <button class="btn btn-primary btn-sm" style="float: right;" (click)="openModal()">Agregar nuevo
                 Empleado </button>
             <h5>Empleados</h5>
             <p>Empleados resgistrados en la base de datos</p>
@@ -171,7 +171,7 @@
                 <div class="form-check col-sm-8">
                     <div class="form-check col-sm-8" *ngFor="let data of Data; let i=index">
                         <input class="form-check-input" type="checkbox" [value]="data.id" id="{{i}}"
-                            (change)="onCheckboxChange($event)" formArrayName="rol">
+                            (change)="onCheckboxChange($event)" formArrayName="rol" [checked]="data.check">
                         <label class="form-check-label" for="{{i}}">
                             {{data.nombre}}
                         </label>
@@ -185,7 +185,8 @@
             <label for="name" class="col-sm-4 text-white"></label>
             <div class="col-sm-7 d-inline m-3 text-white">
                 <div class="form-group  row text-center ">
-                    <button class="btn btn-sm btn-primary" (click)="createNewemployee()" [disabled]="form.invalid">Guardar</button>
+                    <button class="btn btn-sm btn-primary" (click)="createNewemployee()"
+                        [disabled]="form.invalid">Guardar</button>
                 </div>
             </div>
         </div>

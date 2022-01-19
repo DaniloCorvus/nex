@@ -37,16 +37,7 @@ export class employeeComponent implements OnInit {
   Data: Array<any> = [];
   Areas: Array<any> = [];
 
-  form = new FormGroup({
-    name: new FormControl('', [Validators.required]),
-    id: new FormControl(0),
-    sex: new FormControl('', [Validators.required]),
-    area: new FormControl('', [Validators.required]),
-    news: new FormControl('', [Validators.required]),
-    rol: this.fb.array([]),
-    description: new FormControl('', [Validators.required]),
-    email: new FormControl('', [Validators.required, Validators.email]),
-  });
+  form: FormGroup;
 
   pagination = {
     pageSize: 5,
@@ -80,6 +71,19 @@ export class employeeComponent implements OnInit {
       });
   }
 
+  builForm() {
+    this.form = this.fb.group({
+      name: new FormControl('', [Validators.required]),
+      id: new FormControl(0),
+      sex: new FormControl('', [Validators.required]),
+      area: new FormControl('', [Validators.required]),
+      news: new FormControl('', [Validators.required]),
+      rol: this.fb.array([]),
+      description: new FormControl('', [Validators.required]),
+      email: new FormControl('', [Validators.required, Validators.email]),
+    });
+  }
+
   getAllAreas() {
     this.employeeService.getAreas()
       .subscribe((res: any) => {
@@ -98,7 +102,7 @@ export class employeeComponent implements OnInit {
   onCheckboxChange(e) {
     const rol: FormArray = this.form.get('rol') as FormArray;
     if (e.target.checked) {
-      rol.push(new FormControl(e.target.value));
+      rol.push(new FormControl(Number(e.target.value)));
     } else {
       let i: number = 0;
       rol.controls.forEach((item: FormControl) => {
@@ -112,8 +116,6 @@ export class employeeComponent implements OnInit {
   }
 
   anularOActivar(employee) {
-
-
     Swal.fire({
       title: 'Estas Seguro?',
       text: "Deseas registar este empleado!",
@@ -141,18 +143,16 @@ export class employeeComponent implements OnInit {
     })
   }
 
-
-  registerNull(employee) {
-    this.employee = employee;
-
-  }
-
   openModal() {
+    this.builForm()
+    this.Data.forEach((element) => {
+      element['check'] = false
+    })
     this.open(this.content)
   }
 
   getemployee(employee) {
-    console.log({ ...employee });
+    this.builForm()
     this.form.patchValue({
       'id': employee.id,
       'area': employee.area_id,
@@ -161,19 +161,24 @@ export class employeeComponent implements OnInit {
       'news': employee.boletin,
       'description': employee.descripcion,
       'sex': employee.sexo,
-      'rol': this.getRols(employee.roles)
     });
+
+    this.getRols(employee.roles)
     this.open(this.content)
   }
 
 
   getRols(rols: any): any {
-    const rol = []
-    rols.forEach(element => {
-      rol.push(element.id);
+    const rol: FormArray = this.form.get('rol') as FormArray;
+    this.Data.forEach((element) => {
+      if (rols.find((rol) => rol.id == element.id)) {
+        rol.push(new FormControl(element.id));
+        element['check'] = true
+      } else {
+        element['check'] = false
+      }
     });
 
-    return rol
   }
 
   createNewemployee() {
@@ -239,22 +244,9 @@ export class employeeComponent implements OnInit {
 
 
   open(content) {
-    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title', size: 'lg' }).result.then((result) => {
-      this.closeResult = `Closed with: ${result}`;
-    }, (reason) => {
-      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-    });
+    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title', size: 'lg' })
   }
 
-  private getDismissReason(reason: any): string {
-    if (reason === ModalDismissReasons.ESC) {
-      return 'by pressing ESC';
-    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-      return 'by clicking on a backdrop';
-    } else {
-      return `with: ${reason}`;
-    }
-  }
 
   get name_employee_valid() {
     return (
